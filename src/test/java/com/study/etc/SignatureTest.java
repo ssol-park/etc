@@ -1,9 +1,10 @@
 package com.study.etc;
 
 import com.study.etc.signature.SignatureUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -12,8 +13,8 @@ import java.util.Base64;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Slf4j
 class SignatureTest {
+    private static final Logger log = LoggerFactory.getLogger(SignatureTest.class);
     private static KeyPair keyPair;
     private static PrivateKey privateKey;
     private static PublicKey publicKey;
