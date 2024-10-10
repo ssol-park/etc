@@ -1,7 +1,8 @@
 package com.study.etc;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -9,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest
 class EtcTest {
+    private static final Logger logger = LoggerFactory.getLogger(EtcTest.class);
 
     @Test
     void testThreadAsync() {
@@ -20,7 +21,7 @@ class EtcTest {
         // 메인 스레드에서 비동기 작업의 결과를 기다림
         String finalResult = future.handle((result, ex) -> {
             if (ex != null) {
-                System.out.println("* [5] :: Error occurred in main: " + ex.getMessage() + " in thread: " + Thread.currentThread().getName());
+                logger.error("[5] :: Error occurred in main: {} in thread: {}", ex.getMessage(), Thread.currentThread().getName());
                 return "Handled failure in main";
             } else {
                 return result;
@@ -28,7 +29,7 @@ class EtcTest {
         }).join();
 
         // 최종 결과 출력
-        System.out.println("* [6] :: Final result in main: " + finalResult + " in thread: " + Thread.currentThread().getName());
+        logger.info("[6] :: Final result in main: {} in thread: {}", finalResult, Thread.currentThread().getName());
     }
 
     // 비동기 작업을 수행하는 함수
@@ -38,7 +39,7 @@ class EtcTest {
         // 비동기 작업 수행
         new Thread(() -> {
             try {
-                System.out.println("* [1] :: Thread running the async task: " + Thread.currentThread().getName());
+                logger.info("[1] :: Thread running the async task: {}", Thread.currentThread().getName());
 
                 // 작업 중...
                 await().atMost(1, TimeUnit.SECONDS).until(doSomething());
@@ -53,19 +54,15 @@ class EtcTest {
         future
                 .handle((result, ex) -> {
                     if (ex != null) {
-                        System.out.println("* [2] :: Error occurred: " + ex.getMessage() + " in thread: " + Thread.currentThread().getName());
+                        logger.error("[2] :: Error occurred: {} in thread: {}", ex.getMessage(), Thread.currentThread().getName());
                         return "Handled failure";
                     } else {
-                        System.out.println("* [2] :: Handling result in thread: " + Thread.currentThread().getName());
+                        logger.info("[2] :: Handling result in thread: {}", Thread.currentThread().getName());
                         return result;
                     }
                 })
                 .thenAccept(result -> {
-                    System.out.println("* [3] :: Final result: " + result + " in thread: " + Thread.currentThread().getName());
-                })
-                .exceptionally(ex -> {
-                    System.out.println("* [4] :: Exceptionally handling error: " + ex.getMessage() + " in thread: " + Thread.currentThread().getName());
-                    return null;
+                    logger.info("[3] :: Final result: {} in thread: {}", result, Thread.currentThread().getName());
                 });
 
         return future;  // 비동기 작업 결과를 반환
@@ -76,7 +73,6 @@ class EtcTest {
             if (Math.random() > 0.5) {
                 throw new RuntimeException("Task failed");
             }
-
             return true;
         };
     }
