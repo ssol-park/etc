@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,7 +15,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ThreadTest {
+class ThreadTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ThreadTest.class);
 
@@ -85,7 +87,9 @@ public class ThreadTest {
                 return "Success";
 
             } catch (Exception e) {
-                throw new RuntimeException("Unexpected error: " + e.getMessage(), e);
+                logger.error(" @@@@@@@@@@@@@@ ");
+                return "Error";
+//                throw new RuntimeException("Unexpected error: " + e.getMessage(), e);
             }
         }, threadPool)
         .completeOnTimeout("Timeout occurred!", timeoutInMillis, TimeUnit.MILLISECONDS)
@@ -94,6 +98,58 @@ public class ThreadTest {
                 logger.error("[Async] :: Task failed {}", e.getMessage());
             else
                 logger.info("[Async] :: Task {}", result);
+        });
+    }
+
+    @Test
+    void testRunMultipleAsyncTasks02() {
+        Map<String, Object> taskMap = new HashMap<>();
+
+        List<CompletableFuture<Map<String, Object>>> futures = IntStream.rangeClosed(1, 10)
+                .mapToObj(taskNumber -> {
+                    CompletableFuture<Map<String, Object>> mapCompletableFuture = runAsyncTask02(taskNumber, taskMap);
+//                    logger.info("[Future] taskNumber:{}, taskMap:{}", taskNumber, taskMap);
+                    return mapCompletableFuture;
+                })
+                .toList();
+
+        IntStream.rangeClosed(1, 10).mapToObj(taskNumber -> {
+            CompletableFuture<Map<String, Object>> mapCompletableFuture = runAsyncTask02(taskNumber, taskMap);
+//                    logger.info("[Future] taskNumber:{}, taskMap:{}", taskNumber, taskMap);
+            return mapCompletableFuture;
+        })
+        .forEach(result -> {
+
+        });
+    }
+
+    @Test
+    void testRunMultipleAsyncTasks03() {
+
+        List<CompletableFuture<Map<String, Object>>> futures = IntStream.rangeClosed(1, 10)
+                .mapToObj(taskNumber -> runAsyncTask02(taskNumber, new HashMap<>()))
+                .toList();
+
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        allOf.thenRun(() -> {
+            List<Map<String, Object>> maps = futures.stream()
+                    .map(CompletableFuture::join)
+                    .toList();
+
+            maps.forEach(res -> logger.info("res :: {}", res));
+        });
+    }
+
+    private CompletableFuture<Map<String, Object>> runAsyncTask02(int taskNumber, Map<String, Object> taskMap) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (!taskMap.containsKey("key")) {
+                taskMap.put("key", taskNumber);
+            }
+
+            return taskMap;
+        }).thenApply(result -> {
+            logger.info("[runAsyncTask02_thenApply] :: {}", result);
+            return result;
         });
     }
 }
