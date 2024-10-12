@@ -1,4 +1,4 @@
-package com.study.etc;
+package com.study.etc.future;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -15,9 +15,9 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ThreadTest {
+class CompletableFuture02 {
 
-    private static final Logger logger = LoggerFactory.getLogger(ThreadTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(CompletableFuture02.class);
 
     @Test
     void testRunMultipleAsyncTasks() {

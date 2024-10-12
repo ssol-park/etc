@@ -1,4 +1,4 @@
-package com.study.etc;
+package com.study.etc.future;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
 
-class EtcTest {
-    private static final Logger logger = LoggerFactory.getLogger(EtcTest.class);
+class CompletableFuture01 {
+    private static final Logger logger = LoggerFactory.getLogger(CompletableFuture01.class);
 
     @Test
     void testThreadAsync() {
