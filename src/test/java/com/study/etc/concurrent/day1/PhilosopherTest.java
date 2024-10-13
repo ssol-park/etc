@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
-class Sync02 {
+class PhilosopherTest {
 
-    Logger logger = LoggerFactory.getLogger(Sync02.class);
+    Logger logger = LoggerFactory.getLogger(PhilosopherTest.class);
 
     class Chopstick {
         private int id;

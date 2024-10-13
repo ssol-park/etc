@@ -1,6 +1,5 @@
 package com.study.etc.concurrent.day1;
 
-import com.study.etc.concurrent.Counter;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +24,24 @@ class Sync01 {
         subThread.join();
     }
 
+    public class Counter {
+        private volatile int count = 0;
+
+        public void increament() {
+            this.count++;
+        }
+
+        public synchronized void increamentSync() {
+            this.count++;
+        }
+
+        public int getCount() {
+            return this.count;
+        }
+    }
+
     @Test
-    void threadTest02() throws InterruptedException {
+    void testCounter() throws InterruptedException {
 
         final Counter counter = new Counter();
 
