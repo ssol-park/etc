@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class Thread01 {
-    Logger logger = LoggerFactory.getLogger(Thread01.class);
+class Sync01 {
+    Logger logger = LoggerFactory.getLogger(Sync01.class);
 
     @Test
     void testThread() throws InterruptedException {
