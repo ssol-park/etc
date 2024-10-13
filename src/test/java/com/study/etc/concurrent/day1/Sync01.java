@@ -1,5 +1,6 @@
-package com.study.etc.concurrent;
+package com.study.etc.concurrent.day1;
 
+import com.study.etc.concurrent.Counter;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

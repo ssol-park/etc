@@ -1,4 +1,4 @@
-package com.study.etc.concurrent;
+package com.study.etc.concurrent.day1;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
