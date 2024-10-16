@@ -6,23 +6,27 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.IntStream;
 
 class ReentrantLockTest {
 
     Logger logger = LoggerFactory.getLogger(ReentrantLockTest.class);
 
-    public class Counter {
+    class Counter {
         private final ReentrantLock lock = new ReentrantLock();
         private int count = 0;
 
         public void increament() {
-            lock.lock();
+            IntStream.range(1, 10000)
+                    .forEach(i -> {
+                        lock.lock();
 
-            try {
-                this.count++;
-            } finally {
-                lock.unlock();
-            }
+                        try {
+                            this.count++;
+                        } finally {
+                            lock.unlock();
+                        }
+                    });
         }
         
         public void increamentTryLock() {
@@ -64,17 +68,8 @@ class ReentrantLockTest {
     void testCounter() throws InterruptedException {
         Counter counter = new Counter();
 
-        Thread t1 = new Thread(() -> {
-            for (int i = 0; i < 10000; ++i) {
-                counter.increament();
-            }
-        });
-
-        Thread t2 = new Thread(() -> {
-            for (int i = 0; i < 10000; ++i) {
-                counter.increament();
-            }
-        });
+        Thread t1 = new Thread(() -> counter.increament());
+        Thread t2 = new Thread(() -> counter.increament());
 
         t1.start();
         t2.start();
