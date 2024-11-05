@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.etc.reword.RewardMapper">
+
+    <!-- 비관적 락 -->
+    <select id="lockForUpdate" resultType="int" parameterType="string">
+        SELECT COUNT FROM PESSIMISTIC_REWARD_COUNT
+        WHERE GROUP_TYPE = #{groupType} FOR UPDATE
+    </select>
+
+    <update id="decrementPessimisticRewardCount" parameterType="string">
+        UPDATE PESSIMISTIC_REWARD_COUNT
+        SET COUNT = COUNT - 1
+        WHERE GROUP_TYPE = #{groupType} AND COUNT > 0
+    </update>
+
+    <!-- 낙관적 락 -->
+    <update id="decrementOptimisticRewardCount" parameterType="map">
+        UPDATE OPTIMISTIC_REWARD_COUNT
+        SET COUNT = COUNT - 1, VERSION = VERSION + 1
+        WHERE GROUP_TYPE = #{groupType} AND COUNT > 0 AND VERSION = #{version};
+    </update>
+
+    <!-- 현재 버전 조회 -->
+    <select id="getCurrentVersion" resultType="int" parameterType="string">
+        SELECT VERSION FROM OPTIMISTIC_REWARD_COUNT WHERE GROUP_TYPE = #{groupType}
+    </select>
+
+    <!-- 비관적 락: 현재 보상 횟수 조회 -->
+    <select id="getCurrentCountForPessimistic" resultType="int" parameterType="string">
+        SELECT COUNT FROM PESSIMISTIC_REWARD_COUNT WHERE GROUP_TYPE = #{groupType}
+    </select>
+
+    <!-- 낙관적 락: 현재 보상 횟수 조회 -->
+    <select id="getCurrentCountForOptimistic" resultType="int" parameterType="string">
+        SELECT COUNT FROM OPTIMISTIC_REWARD_COUNT WHERE GROUP_TYPE = #{groupType}
+    </select>
+</mapper>
