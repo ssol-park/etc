@@ -1,6 +1,5 @@
-package com.study.etc;
+package com.study.etc.signature;
 
-import com.study.etc.signature.SignatureUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
