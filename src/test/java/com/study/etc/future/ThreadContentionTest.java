@@ -1,4 +1,4 @@
-package com.study.etc.concurrent.day3;
+package com.study.etc.future;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

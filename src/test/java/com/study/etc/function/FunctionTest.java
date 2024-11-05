@@ -1,4 +1,4 @@
-package com.study.etc.function.day1;
+package com.study.etc.function;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

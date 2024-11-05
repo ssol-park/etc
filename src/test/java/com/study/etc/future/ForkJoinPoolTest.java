@@ -4,16 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class ForkPoolJoinTest {
+class ForkJoinPoolTest {
 
-    Logger logger = LoggerFactory.getLogger(ForkPoolJoinTest.class);
+    Logger logger = LoggerFactory.getLogger(ForkJoinPoolTest.class);
 
     @Test
     void commonPoolTest() {
