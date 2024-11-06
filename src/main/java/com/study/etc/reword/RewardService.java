@@ -35,12 +35,11 @@ public class RewardService {
         }
     }
 
-    // 현재 보상 횟수 조회 (비관적 락)
+    // 현재 보상 횟수 조회
     public int getCurrentCountForPessimistic(String groupType) {
         return rewardMapper.getCurrentCountForPessimistic(groupType);
     }
 
-    // 현재 보상 횟수 조회 (낙관적 락)
     public int getCurrentCountForOptimistic(String groupType) {
         return rewardMapper.getCurrentCountForOptimistic(groupType);
     }
@@ -49,4 +48,16 @@ public class RewardService {
     public int getCurrentVersion(String groupType) {
         return rewardMapper.getCurrentVersion(groupType);
     }
+
+    // 횟수 초기화
+    @Transactional
+    public void resetPessimisticRewardCount() {
+        rewardMapper.resetPessimisticRewardCount();
+    }
+
+    @Transactional
+    public void resetOptimisticRewardCount() {
+        rewardMapper.resetOptimisticRewardCount();
+    }
+
 }

@@ -2,7 +2,7 @@ package com.study.etc.concurrent.day1;
 
 import org.junit.jupiter.api.Test;
 
-class ReorderingTest {
+class ㅈReorderingTest {
 
     // AS-IS
 //    private static int x = 0;

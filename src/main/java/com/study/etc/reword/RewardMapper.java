@@ -13,4 +13,8 @@ public interface RewardMapper {
 
     int getCurrentCountForPessimistic(String groupType);
     int getCurrentCountForOptimistic(String groupType);
+
+    void resetPessimisticRewardCount();
+
+    void resetOptimisticRewardCount();
 }

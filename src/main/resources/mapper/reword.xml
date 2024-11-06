@@ -38,4 +38,18 @@
     <select id="getCurrentCountForOptimistic" resultType="int" parameterType="string">
         SELECT COUNT FROM OPTIMISTIC_REWARD_COUNT WHERE GROUP_TYPE = #{groupType}
     </select>
+
+    <!-- 비관적 락 카운트 리셋 -->
+    <insert id="resetPessimisticRewardCount">
+        INSERT INTO PESSIMISTIC_REWARD_COUNT (GROUP_TYPE, COUNT)
+        VALUES ('A', 100), ('B', 10), ('C', 10), ('D', 5)
+            ON DUPLICATE KEY UPDATE COUNT = VALUES(COUNT);
+    </insert>
+
+    <!-- 낙관적 락 카운트 리셋 -->
+    <insert id="resetOptimisticRewardCount">
+        INSERT INTO OPTIMISTIC_REWARD_COUNT (GROUP_TYPE, COUNT, VERSION)
+        VALUES ('A', 100, 1), ('B', 10, 1), ('C', 10, 1), ('D', 5, 1)
+            ON DUPLICATE KEY UPDATE COUNT = VALUES(COUNT), VERSION = VALUES(VERSION);
+    </insert>
 </mapper>
