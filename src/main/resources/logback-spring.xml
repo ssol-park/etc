@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <!-- 콘솔로 로그 출력 -->
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- 콘솔 로그 출력 설정 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- JDBC 로깅 레벨 설정 -->
-    <logger name="jdbc.sqlonly" level="OFF" />
-    <logger name="jdbc.sqltiming" level="INFO" />
-    <logger name="jdbc.resultsettable" level="INFO" />
-    <logger name="jdbc.audit" level="OFF" />
-    <logger name="jdbc.resultset" level="OFF" />
-    <logger name="jdbc.connection" level="OFF" />
+    <!-- MyBatis 및 JDBC 쿼리 로그를 DEBUG 수준으로 설정 -->
+    <logger name="org.mybatis" level="INFO" />
+    <logger name="org.springframework.jdbc.core" level="INFO" />
+    <logger name="com.study.etc.reword" level="DEBUG" /> <!-- 패키지에 맞게 조정 -->
 
-    <!-- 전체 로깅 설정 -->
+    <!-- 루트 로거 설정 -->
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="CONSOLE" />
     </root>
-
 </configuration>
