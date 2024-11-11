@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,18 +59,32 @@ class RewardTest {
     }
 
     @Test
-    void 낙관적_락_충돌_발생시_예외_발생() {
+    void 낙관적_락_충돌_발생시_예외_발생() throws InterruptedException {
         // Given
         String groupType = "D";
-        int version = rewardService.getCurrentVersion(groupType);
+        int threadCount = 10;
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        AtomicInteger exceptionCount = new AtomicInteger(0);
 
-        // 이미 차감하여 버전 변경을 유도
-        rewardService.decrementOptimisticRewardCount(groupType);
+        // When
+        for (int i = 0; i < threadCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    rewardService.decrementOptimisticRewardCount(groupType);
+                } catch (RuntimeException e) {
+                    exceptionCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
 
-        // When & Then
-        assertThatThrownBy(() -> rewardService.decrementOptimisticRewardCount(groupType))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("낙관적 락 충돌 발생");
+        // All threads complete
+        latch.await();
+        executorService.shutdown();
+
+        assertThat(exceptionCount.get()).isGreaterThan(0);
     }
 
     @Test
