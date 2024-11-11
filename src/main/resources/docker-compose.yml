@@ -15,3 +15,13 @@ services:
     volumes:
       - ./mysql-data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # 초기화 스크립트 실행
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # RabbitMQ 연결 포트
+      - "15672:15672" # RabbitMQ 관리 콘솔 포트
