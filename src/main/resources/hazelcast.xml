@@ -1,0 +1,57 @@
+<hazelcast xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.hazelcast.com/schema/config
+           https://hazelcast.com/schema/config/hazelcast-config-5.1.xsd">
+
+    <network>
+        <join>
+            <multicast enabled="false"/>
+            <tcp-ip enabled="true">
+                <member>127.0.0.1</member>
+            </tcp-ip>
+        </join>
+    </network>
+
+    <!-- 기본 캐시 맵 설정 -->
+    <map name="default">
+        <!-- 엔트리 생존 시간: 3600초 (1시간) -->
+        <time-to-live-seconds>3600</time-to-live-seconds>
+
+        <!-- 접근 없을 경우 제거 대기 시간: 600초 (10분) -->
+        <max-idle-seconds>600</max-idle-seconds>
+
+        <!-- 메모리 초과 시 제거 정책 -->
+        <eviction max-size-policy="PER_NODE"
+                  size="1000"
+                  eviction-policy="LRU"/>
+
+        <!-- 백업 복제본 개수: 1개 노드에 추가로 저장 -->
+        <backup-count>1</backup-count>
+
+        <!-- 메모리 저장 방식 (BINARY: 직렬화된 형태) -->
+        <in-memory-format>BINARY</in-memory-format>
+
+        <!-- 통계 활성화 -->
+        <statistics-enabled>true</statistics-enabled>
+
+        <!-- 향후 DB 연동 시 활성화 가능 -->
+        <!--
+        <map-store enabled="true">
+            <class-name>com.example.MyMapStore</class-name>
+            <write-delay-seconds>0</write-delay-seconds>
+        </map-store>
+        -->
+
+        <!-- 향후 Near Cache 설정 예시 -->
+        <!--
+        <near-cache>
+            <time-to-live-seconds>60</time-to-live-seconds>
+            <in-memory-format>OBJECT</in-memory-format>
+            <eviction eviction-policy="LFU"
+                      size="1000"
+                      max-size-policy="ENTRY_COUNT"/>
+        </near-cache>
+        -->
+    </map>
+
+</hazelcast>
