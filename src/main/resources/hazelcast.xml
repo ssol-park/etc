@@ -42,7 +42,7 @@
         </map-store>
         -->
 
-        <!-- 향후 Near Cache 설정 예시 -->
+        <!-- 향후 Near Cache 설정 예시 test -->
         <!--
         <near-cache>
             <time-to-live-seconds>60</time-to-live-seconds>
