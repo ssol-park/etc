@@ -43,7 +43,7 @@
         -->
 
         <!-- 향후 Near Cache 설정 예시 test -->
-        <!--dfd
+        <!--dfddfsdf
         <near-cache>
             <time-to-live-seconds>60</time-to-live-seconds>
             <in-memory-format>OBJECT</in-memory-format>
