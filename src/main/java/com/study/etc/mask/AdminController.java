@@ -19,12 +19,13 @@ public class AdminController {
      */
     @PersonalDataMasking
     @GetMapping("/accounts")
-    public List<UserDto> getAccounts() {
-        return Arrays.asList(
+    public ResponseDto<List<UserDto>> getAccounts() {
+        List<UserDto> users = Arrays.asList(
             new UserDto("홍길동", "hong123@gmail.com", "01012345678"),
             new UserDto("김철수", "kimcs456@naver.com", "01098765432"),
             new UserDto("이영희", "lee789@daum.net", "0212344567")
         );
+        return new ResponseDto<>(users);
     }
     
     /**
@@ -32,11 +33,12 @@ public class AdminController {
      */
     @PersonalDataMasking
     @GetMapping("/mail-history")
-    public List<MailHistoryDto> getMailHistory() {
-        return Arrays.asList(
+    public ResponseDto<List<MailHistoryDto>> getMailHistory() {
+        List<MailHistoryDto> mailHistory = Arrays.asList(
             new MailHistoryDto("홍길동", "hong123@gmail.com", "회원가입 인증", "2024-01-15 10:30:00"),
             new MailHistoryDto("김철수", "kimcs456@naver.com", "비밀번호 재설정", "2024-01-15 11:15:00")
         );
+        return new ResponseDto<>(mailHistory);
     }
     
     /**
@@ -104,5 +106,19 @@ public class AdminController {
         
         public String getSentDate() { return sentDate; }
         public void setSentDate(String sentDate) { this.sentDate = sentDate; }
+    }
+    
+    /**
+     * 응답 DTO
+     */
+    public static class ResponseDto<T> {
+        private T data;
+        
+        public ResponseDto(T data) {
+            this.data = data;
+        }
+        
+        public T getData() { return data; }
+        public void setData(T data) { this.data = data; }
     }
 }
