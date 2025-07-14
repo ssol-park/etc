@@ -7,8 +7,11 @@ import java.util.regex.Pattern;
  */
 public class MaskingUtil {
     
-    // 이메일 패턴
+    // 정규식 패턴들을 미리 컴파일하여 성능 향상
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    private static final Pattern DIGITS_ONLY_PATTERN = Pattern.compile("^\\d+$");
+    private static final Pattern PHONE_VALIDATION_PATTERN = Pattern.compile("^\\d{8,11}$");
+    private static final Pattern HYPHEN_PATTERN = Pattern.compile("-");
     
     /**
      * 이름 마스킹 처리 (짝수 자리 마스킹)
@@ -19,10 +22,11 @@ public class MaskingUtil {
             return name;
         }
         
-        StringBuilder masked = new StringBuilder();
+        // 초기 용량을 name 길이로 설정하여 재할당 방지
+        StringBuilder masked = new StringBuilder(name.length());
         for (int i = 0; i < name.length(); i++) {
             if (i % 2 == 1) { // 짝수 자리 (0-based이므로 1,3,5... 인덱스)
-                masked.append("*");
+                masked.append('*');
             } else {
                 masked.append(name.charAt(i));
             }
@@ -40,59 +44,92 @@ public class MaskingUtil {
             return email;
         }
         
-        int atIndex = email.indexOf("@");
+        int atIndex = email.indexOf('@');
         String localPart = email.substring(0, atIndex);
         String domainPart = email.substring(atIndex);
         
-        String maskedLocal;
+        StringBuilder result = new StringBuilder(email.length());
+        
         if (localPart.length() <= 3) {
             // 3글자 이하면 글자 수만큼 * 처리
-            maskedLocal = "*".repeat(localPart.length());
+            appendRepeatedChar(result, '*', localPart.length());
         } else {
             // 4글자 이상이면 처음 2자리만 보여주고 나머지는 ***
-            maskedLocal = localPart.substring(0, 2) + "***";
+            result.append(localPart, 0, 2).append("***");
         }
+        result.append(domainPart);
         
-        return maskedLocal + domainPart;
+        return result.toString();
     }
     
     /**
      * 전화번호 마스킹 처리 (하이픈 없음)
      * 예: "01012345678" -> "010****5678"
-     * 예: "0212345678" -> "02***5678"
+     * 예: "0212345678" -> "021***5678"
      * 예: "031987654" -> "031**654"
      */
     public static String maskPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+        if (phoneNumber == null) {
+            return null;
+        }
+        
+        // trim() 최적화: 앞뒤 공백이 있는 경우에만 trim 수행
+        String trimmedPhone = phoneNumber;
+        if (needsTrim(phoneNumber)) {
+            trimmedPhone = phoneNumber.trim();
+            if (trimmedPhone.isEmpty()) {
+                return phoneNumber;
+            }
+        } else if (phoneNumber.isEmpty()) {
             return phoneNumber;
         }
         
-        // 숫자만 추출 (하이픈이 있어도 제거)
-        String cleanPhone = phoneNumber.replaceAll("-", "");
+        // 하이픈이 있는 경우에만 제거
+        String cleanPhone = trimmedPhone;
+        if (trimmedPhone.indexOf('-') >= 0) {
+            cleanPhone = HYPHEN_PATTERN.matcher(trimmedPhone).replaceAll("");
+        }
         
         if (cleanPhone.length() < 8) {
             return phoneNumber; // 너무 짧으면 마스킹하지 않음
         }
         
         // 숫자가 아닌 문자가 포함되어 있으면 마스킹하지 않음
-        if (!cleanPhone.matches("^\\d+$")) {
+        if (!DIGITS_ONLY_PATTERN.matcher(cleanPhone).matches()) {
             return phoneNumber;
         }
         
-        // 11자리 (010-XXXX-XXXX 형태)
-        if (cleanPhone.length() == 11 && cleanPhone.startsWith("010")) {
-            return cleanPhone.substring(0, 3) + "****" + cleanPhone.substring(7);
-        } 
-        // 10자리 (031-XXX-XXXX 등)
-        else if (cleanPhone.length() == 10) {
-            return cleanPhone.substring(0, 3) + "***" + cleanPhone.substring(6);
-        }
-        // 9자리 (031-XX-XXXX 등)
-        else if (cleanPhone.length() == 9) {
-            return cleanPhone.substring(0, 3) + "**" + cleanPhone.substring(6);
+        return applyPhoneMasking(cleanPhone);
+    }
+    
+    /**
+     * 전화번호 길이에 따른 마스킹 적용
+     */
+    private static String applyPhoneMasking(String cleanPhone) {
+        StringBuilder result = new StringBuilder(cleanPhone.length());
+        
+        switch (cleanPhone.length()) {
+            case 11:
+                if (cleanPhone.startsWith("010")) {
+                    return result.append(cleanPhone, 0, 3)
+                            .append("****")
+                            .append(cleanPhone, 7, 11)
+                            .toString();
+                }
+                break;
+            case 10:
+                return result.append(cleanPhone, 0, 3)
+                        .append("***")
+                        .append(cleanPhone, 6, 10)
+                        .toString();
+            case 9:
+                return result.append(cleanPhone, 0, 3)
+                        .append("**")
+                        .append(cleanPhone, 6, 9)
+                        .toString();
         }
         
-        return phoneNumber; // 예상하지 못한 형태는 마스킹하지 않음
+        return cleanPhone; // 예상하지 못한 형태는 마스킹하지 않음
     }
     
     /**
@@ -106,8 +143,35 @@ public class MaskingUtil {
      * 문자열이 전화번호 형식인지 확인
      */
     public static boolean isPhoneNumber(String value) {
-        if (value == null) return false;
-        String cleanValue = value.replaceAll("-", "");
-        return cleanValue.matches("^\\d{8,11}$");
+        if (value == null) {
+            return false;
+        }
+        
+        String cleanValue = value;
+        if (value.indexOf('-') >= 0) {
+            cleanValue = HYPHEN_PATTERN.matcher(value).replaceAll("");
+        }
+        
+        return PHONE_VALIDATION_PATTERN.matcher(cleanValue).matches();
+    }
+    
+    /**
+     * 문자 반복을 StringBuilder에 추가 (String.repeat 대신 사용)
+     */
+    private static void appendRepeatedChar(StringBuilder sb, char ch, int count) {
+        for (int i = 0; i < count; i++) {
+            sb.append(ch);
+        }
+    }
+    
+    /**
+     * 문자열이 trim이 필요한지 확인
+     */
+    private static boolean needsTrim(String str) {
+        if (str.isEmpty()) {
+            return false;
+        }
+        return Character.isWhitespace(str.charAt(0)) || 
+               Character.isWhitespace(str.charAt(str.length() - 1));
     }
 }
